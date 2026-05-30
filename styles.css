@@ -18,10 +18,12 @@ body.crb-hide-default-actions .side-dock-actions {
   display: none !important;
 }
 
-/* 设置面板样式 */
+/* 设置面板样式 — 固定标签页 + 可滚动内容 */
 
-.basic-vault-button-setting-ui {
-  width: 100%;
+.basic-vault-settings-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .basic-vault-settings-tabs {
@@ -30,7 +32,8 @@ body.crb-hide-default-actions .side-dock-actions {
   border-bottom: 1px solid var(--background-modifier-border);
   overflow-x: auto;
   padding: 0;
-  margin: 0 0 16px;
+  margin: 0;
+  flex-shrink: 0;
 }
 
 .basic-vault-settings-tabs::-webkit-scrollbar {
@@ -62,8 +65,14 @@ body.crb-hide-default-actions .side-dock-actions {
   border-bottom-color: var(--interactive-accent);
 }
 
+.basic-vault-settings-scroll {
+  flex: 1 1 0;
+  overflow-y: auto;
+  min-height: 0;
+}
+
 .basic-vault-settings-content {
-  padding-top: 0;
+  padding-top: 16px;
 }
 
 .basic-vault-settings-content .setting-group + .setting-item-heading {

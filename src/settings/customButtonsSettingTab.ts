@@ -35,14 +35,18 @@ export class CustomButtonsSettingTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
-		containerEl.addClass('basic-vault-button-setting-ui');
+		containerEl.addClass('basic-vault-settings-root');
 
-		const tabsEl = containerEl.createDiv({ cls: 'basic-vault-settings-tabs' });
-		const contentEl = containerEl.createDiv({ cls: 'basic-vault-settings-content' });
+		// 固定顶部标签栏
+		const tabsEl = containerEl.createEl('div', { cls: 'basic-vault-settings-tabs' });
 
 		this.createTabButton(tabsEl, 'general', '通用');
 		this.createTabButton(tabsEl, 'left-ribbon', '左侧边栏');
 		this.createTabButton(tabsEl, 'page-header', '页首');
+
+		// 可滚动内容区域
+		const scrollEl = containerEl.createDiv({ cls: 'basic-vault-settings-scroll' });
+		const contentEl = scrollEl.createDiv({ cls: 'basic-vault-settings-content' });
 
 		this.renderActiveTab(contentEl);
 	}
