@@ -91,17 +91,51 @@ export class CustomButtonsSettingTab extends PluginSettingTab {
 	}
 
 	private renderButtonsTab(contentEl: HTMLElement, area: ButtonArea) {
-		const groupEl = contentEl.createDiv({ cls: 'setting-group basic-vault-button-group' });
-		const listContainer = groupEl.createDiv({ cls: 'basic-vault-button-list-container' });
 		const items = this.getItems(area);
+		const itemsGroup = new SettingGroup(contentEl);
 
 		if (items.length === 0) {
-			this.createEmptySetting(listContainer, area);
+			itemsGroup.addSetting((setting) => {
+				setting
+					.setName(area === 'left-ribbon' ? '还没有添加左侧边栏按钮' : '还没有添加页首按钮')
+					.setDesc(area === 'left-ribbon' ? '点击下方按钮开始创建左侧边栏按钮或分割线' : '点击下方按钮开始创建页首按钮');
+			});
 		} else {
-			this.createButtonsList(listContainer, area);
+			items.forEach((item, index) => {
+				if (item.type === 'divider') {
+					this.createDividerSetting(itemsGroup, item, index, 'left-ribbon');
+					return;
+				}
+
+				this.createButtonSetting(itemsGroup, item, index, area);
+			});
 		}
 
-		this.createAddButtons(groupEl, area);
+		// 添加按钮 — 复刻 custom-about-blank 的 add-setting 模式
+		itemsGroup.addSetting((addSetting) => {
+			addSetting.settingEl.addClass('basic-vault-item-add-setting');
+			addSetting.controlEl.addClass('basic-vault-item-add-container');
+
+			addSetting.addButton((button) => {
+				button
+					.setButtonText('添加新按钮')
+					.setClass('basic-vault-item-add-btn')
+					.onClick(() => {
+						void this.addCustomButton(area);
+					});
+			});
+
+			if (area === 'left-ribbon') {
+				addSetting.addButton((button) => {
+					button
+						.setButtonText('添加分割线')
+						.setClass('basic-vault-item-add-btn')
+						.onClick(() => {
+							void this.addDivider(area);
+						});
+				});
+			}
+		});
 	}
 
 	private createGlobalSettings(containerEl: HTMLElement) {
@@ -166,47 +200,6 @@ export class CustomButtonsSettingTab extends PluginSettingTab {
 		});
 	}
 
-	private createEmptySetting(parentEl: HTMLElement, area: ButtonArea) {
-		new Setting(parentEl)
-			.setName(area === 'left-ribbon' ? '还没有添加左侧边栏按钮' : '还没有添加页首按钮')
-			.setDesc(area === 'left-ribbon' ? '点击下方按钮开始创建左侧边栏按钮或分割线' : '点击下方按钮开始创建页首按钮');
-	}
-
-	private createButtonsList(parentEl: HTMLElement, area: ButtonArea) {
-		const buttonsContainer = parentEl.createDiv({ cls: 'basic-vault-button-list' });
-
-		this.getItems(area).forEach((item, index) => {
-			if (item.type === 'divider') {
-				this.createDividerSetting(buttonsContainer, item, index, 'left-ribbon');
-				return;
-			}
-
-			this.createButtonSetting(buttonsContainer, item, index, area);
-		});
-	}
-
-	private createAddButtons(containerEl: HTMLElement, area: ButtonArea) {
-		const addButtonsContainer = containerEl.createDiv({ cls: 'basic-vault-button-add-container' });
-
-		const addButton = addButtonsContainer.createEl('button', {
-			text: area === 'left-ribbon' ? '添加新按钮' : '添加新按钮',
-			cls: 'basic-vault-button-add-btn'
-		});
-		addButton.addEventListener('click', () => {
-			void this.addCustomButton(area);
-		});
-
-		if (area === 'left-ribbon') {
-			const addDividerButton = addButtonsContainer.createEl('button', {
-				text: '添加分割线',
-				cls: 'basic-vault-button-add-btn'
-			});
-			addDividerButton.addEventListener('click', () => {
-				void this.addDivider(area);
-			});
-		}
-	}
-
 	private async addCustomButton(area: ButtonArea) {
 		const newButton = createCustomButton();
 		this.getItems(area).push(newButton);
@@ -256,33 +249,33 @@ export class CustomButtonsSettingTab extends PluginSettingTab {
 		await this.removeButtonItem(area, index);
 	}
 
-	private createButtonSetting(containerEl: HTMLElement, button: CustomButton, index: number, area: ButtonArea) {
-		const setting = new Setting(containerEl)
-			.setName(button.tooltip.trim() || '未命名按钮');
+	private createButtonSetting(actionsGroup: SettingGroup, button: CustomButton, index: number, area: ButtonArea) {
+		actionsGroup.addSetting((setting) => {
+			setting.settingEl.addClass('basic-vault-button-setting');
+			setting.settingEl.dataset.index = index.toString();
+			setting.settingEl.dataset.area = area;
+			setting.setName(button.tooltip.trim() || '未命名按钮');
+			setting.setDesc(this.getButtonSummary(button));
+			this.decorateButtonName(setting, button);
 
-		setting.settingEl.addClass('basic-vault-button-setting');
-		setting.settingEl.dataset.index = index.toString();
-		setting.settingEl.dataset.area = area;
-		setting.setDesc(this.getButtonSummary(button));
-		this.decorateButtonName(setting, button);
+			this.makeDraggable(setting.settingEl, index, area);
 
-		this.makeDraggable(setting.settingEl, index, area);
+			setting
+				.addExtraButton((extraButton) => extraButton
+					.setIcon('pencil')
+					.setTooltip('编辑按钮')
+					.onClick(() => {
+						this.openButtonEditor(area, index);
+					}))
+				.addExtraButton((extraButton) => extraButton
+					.setIcon('trash')
+					.setTooltip('删除按钮')
+					.onClick(() => {
+						void this.confirmRemoveItem(area, index);
+					}));
 
-		setting
-			.addExtraButton((extraButton) => extraButton
-				.setIcon('pencil')
-				.setTooltip('编辑按钮')
-				.onClick(() => {
-					this.openButtonEditor(area, index);
-				}))
-			.addExtraButton((extraButton) => extraButton
-				.setIcon('trash')
-				.setTooltip('删除按钮')
-				.onClick(() => {
-					void this.confirmRemoveItem(area, index);
-				}));
-
-		this.addDragHandle(setting, index, area);
+			this.addDragHandle(setting, index, area);
+		});
 	}
 
 	private openButtonEditor(area: ButtonArea, index: number, refreshOnClose: boolean = true) {
@@ -386,23 +379,24 @@ export class CustomButtonsSettingTab extends PluginSettingTab {
 		}
 	}
 
-	private createDividerSetting(containerEl: HTMLElement, divider: DividerItem, index: number, area: Extract<ButtonArea, 'left-ribbon'>) {
-		const setting = new Setting(containerEl)
-			.setName('分割线')
-			.setDesc('用于分隔自定义按钮')
-			.addExtraButton((extraButton) => extraButton
+	private createDividerSetting(actionsGroup: SettingGroup, divider: DividerItem, index: number, area: Extract<ButtonArea, 'left-ribbon'>) {
+		actionsGroup.addSetting((setting) => {
+			setting.settingEl.addClass('basic-vault-button-setting');
+			setting.settingEl.dataset.index = index.toString();
+			setting.settingEl.dataset.area = area;
+			setting.setName('分割线');
+			setting.setDesc('用于分隔自定义按钮');
+
+			setting.addExtraButton((extraButton) => extraButton
 				.setIcon('trash')
 				.setTooltip('删除分割线')
 				.onClick(() => {
 					void this.confirmRemoveItem(area, index);
 				}));
 
-		setting.settingEl.addClass('basic-vault-button-setting');
-		setting.settingEl.dataset.index = index.toString();
-		setting.settingEl.dataset.area = area;
-
-		this.makeDraggable(setting.settingEl, index, area);
-		this.addDragHandle(setting, index, area);
+			this.makeDraggable(setting.settingEl, index, area);
+			this.addDragHandle(setting, index, area);
+		});
 	}
 
 	private addDragHandle(setting: Setting, index: number, area: ButtonArea) {

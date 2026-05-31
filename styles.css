@@ -88,88 +88,8 @@ body.crb-hide-default-actions .side-dock-actions {
   flex-shrink: 0;
 }
 
-/* 按钮列表容器 - 对齐 custom-about-blank 的 heading 布局 */
-.basic-vault-button-list-container {
-  padding-top: 0;
-}
+/* 按钮设置项样式 — 复刻 custom-about-blank */
 
-.basic-vault-button-group {
-  background-color: var(--setting-items-background);
-  border-radius: var(--radius-m);
-  margin: 0 0 1em 0;
-  padding: 1em;
-  border-top: none;
-}
-
-/* 添加按钮容器样式 */
-.basic-vault-button-add-container {
-  display: flex;
-  gap: 0.75em;
-  margin: 0.75em 0.25em 0.25em;
-  padding-top: 0.75em;
-  border-top: var(--border-width) solid var(--background-modifier-border);
-}
-
-/* 添加按钮样式 */
-.basic-vault-button-add-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.375em;
-  background-color: var(--interactive-accent);
-  color: var(--text-on-accent);
-  border: none;
-  border-radius: var(--radius-s);
-  padding: 0.5em 0.75em;
-  cursor: pointer;
-  font-size: var(--font-ui-small);
-  font-weight: 500;
-  transition: background-color 0.2s ease;
-  flex: 1;
-}
-
-.basic-vault-button-add-btn:hover {
-  background-color: var(--interactive-accent-hover);
-}
-
-/* 按钮列表容器 - 完全按照 Note Toolbar */
-.basic-vault-button-list {
-  background-color: transparent;
-  border-radius: 0;
-  margin: 0;
-  padding: 0;
-}
-
-.basic-vault-button-list .setting-item {
-  background-color: transparent !important;
-  border-radius: 0;
-  border-top: var(--border-width) solid var(--background-modifier-border);
-  padding: 0.5em;
-  margin: 0.25em;
-  min-height: 58px;
-}
-
-.basic-vault-button-list .setting-item:first-child {
-  border-top: none;
-}
-
-.basic-vault-button-list .setting-item:focus-within {
-  border-radius: var(--radius-m);
-}
-
-/* 拖拽手柄样式 - 常态显示 */
-.basic-vault-button-list .setting-item .drag-handle {
-  cursor: grab;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  padding: 4px;
-}
-
-.basic-vault-button-list .setting-item .drag-handle:active {
-  cursor: grabbing;
-}
-
-/* 按钮设置项 - 默认横向布局，宽度不足时切换为自适应布局 */
 .basic-vault-button-setting {
   align-items: center;
 }
@@ -178,6 +98,24 @@ body.crb-hide-default-actions .side-dock-actions {
   flex: 1 1 auto;
   min-width: 0;
   padding-right: 12px;
+}
+
+.basic-vault-button-setting .setting-item-name,
+.basic-vault-button-setting .setting-item-description {
+  overflow-wrap: anywhere;
+}
+
+.basic-vault-button-setting .setting-item-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.basic-vault-button-setting .setting-item-control {
+  flex: none;
+  margin-left: auto;
 }
 
 .basic-vault-button-name-wrap {
@@ -265,22 +203,49 @@ body.crb-hide-default-actions .side-dock-actions {
   }
 }
 
-.basic-vault-button-setting .setting-item-name,
-.basic-vault-button-setting .setting-item-description {
-  overflow-wrap: anywhere;
+/* 添加按钮区域 — 复刻 custom-about-blank 的 item-add 模式 */
+.basic-vault-item-add-setting {
+  padding: 0;
+  border-top: none;
+  min-height: auto;
 }
 
-.basic-vault-button-setting .setting-item-description {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.basic-vault-item-add-setting .setting-item-info {
+  display: none;
 }
 
-.basic-vault-button-setting .setting-item-control {
-  flex: none;
-  margin-left: auto;
+.basic-vault-item-add-setting .setting-item-control {
+  width: 100%;
+  margin-left: 0;
+  padding-top: 0;
+}
+
+.basic-vault-item-add-container {
+  display: flex;
+  gap: 0.75em;
+  width: 100%;
+  margin: 0;
+  padding-top: 0;
+}
+
+.basic-vault-item-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375em;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--radius-s);
+  padding: 0.5em 0.75em;
+  cursor: pointer;
+  font-size: var(--font-ui-small);
+  font-weight: 500;
+  transition: background 0.2s ease;
+  flex: 1;
+}
+
+.basic-vault-item-add-btn:hover {
+  background: var(--interactive-accent-hover);
 }
 
 .basic-vault-button-editor-modal-shell {
@@ -506,11 +471,11 @@ body.crb-hide-default-actions .side-dock-actions {
 
 /* 响应式调整 */
 @media (max-width: 768px) {
-  .basic-vault-button-add-container {
+  .basic-vault-item-add-container {
     flex-direction: column;
   }
   
-  .basic-vault-button-add-btn {
+  .basic-vault-item-add-btn {
     width: 100%;
     justify-content: center;
   }
